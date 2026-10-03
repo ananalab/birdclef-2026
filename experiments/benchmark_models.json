@@ -1,0 +1,321 @@
+{
+  "experiment_id": "benchmark_models",
+  "timestamp": "2026-05-17T04:33:19",
+  "duration_seconds": 271.6,
+  "config": {
+    "features_path": "data/processed/features_top10_n50_w3_all.parquet",
+    "n_splits": 5,
+    "cv_strategy": "StratifiedGroupKFold groupe par filename, identique sessions 3.1/3.2"
+  },
+  "dataset": {
+    "n_samples": 1343,
+    "n_features": 969,
+    "n_species": 10,
+    "species": [
+      "banana",
+      "coffal1",
+      "compau",
+      "fepowl",
+      "houspa",
+      "osprey",
+      "rubthr1",
+      "socfly1",
+      "soulap1",
+      "yeofly1"
+    ]
+  },
+  "results_by_model": {
+    "XGBoost": {
+      "n_splits": 5,
+      "macro_roc_auc_mean": 0.8732,
+      "macro_roc_auc_std": 0.0219,
+      "macro_per_fold": [
+        0.8676,
+        0.881,
+        0.8487,
+        0.9065,
+        0.8621
+      ],
+      "per_species_mean": {
+        "banana": 0.923,
+        "coffal1": 0.9274,
+        "compau": 0.8938,
+        "fepowl": 0.8277,
+        "houspa": 0.8935,
+        "osprey": 0.7813,
+        "rubthr1": 0.8685,
+        "socfly1": 0.8411,
+        "soulap1": 0.9007,
+        "yeofly1": 0.875
+      },
+      "per_species_std": {
+        "banana": 0.0453,
+        "coffal1": 0.0268,
+        "compau": 0.0363,
+        "fepowl": 0.0836,
+        "houspa": 0.0404,
+        "osprey": 0.072,
+        "rubthr1": 0.0484,
+        "socfly1": 0.0711,
+        "soulap1": 0.034,
+        "yeofly1": 0.0406
+      },
+      "fold_info": [
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1067,
+          "n_val": 276,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1074,
+          "n_val": 269,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        }
+      ],
+      "duration_seconds": 215.4
+    },
+    "RandomForest": {
+      "n_splits": 5,
+      "macro_roc_auc_mean": 0.8642,
+      "macro_roc_auc_std": 0.0245,
+      "macro_per_fold": [
+        0.8427,
+        0.8873,
+        0.8493,
+        0.8942,
+        0.8475
+      ],
+      "per_species_mean": {
+        "banana": 0.9299,
+        "coffal1": 0.8974,
+        "compau": 0.8896,
+        "fepowl": 0.8277,
+        "houspa": 0.9071,
+        "osprey": 0.7318,
+        "rubthr1": 0.8421,
+        "socfly1": 0.8472,
+        "soulap1": 0.8989,
+        "yeofly1": 0.8701
+      },
+      "per_species_std": {
+        "banana": 0.042,
+        "coffal1": 0.0267,
+        "compau": 0.0287,
+        "fepowl": 0.0785,
+        "houspa": 0.0382,
+        "osprey": 0.1037,
+        "rubthr1": 0.1075,
+        "socfly1": 0.1014,
+        "soulap1": 0.0552,
+        "yeofly1": 0.0388
+      },
+      "fold_info": [
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1067,
+          "n_val": 276,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1074,
+          "n_val": 269,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        }
+      ],
+      "duration_seconds": 35.4
+    },
+    "LogReg L1": {
+      "n_splits": 5,
+      "macro_roc_auc_mean": 0.858,
+      "macro_roc_auc_std": 0.0142,
+      "macro_per_fold": [
+        0.8399,
+        0.8665,
+        0.8511,
+        0.8767,
+        0.8561
+      ],
+      "per_species_mean": {
+        "banana": 0.9126,
+        "coffal1": 0.8708,
+        "compau": 0.8732,
+        "fepowl": 0.7725,
+        "houspa": 0.8944,
+        "osprey": 0.7817,
+        "rubthr1": 0.8595,
+        "socfly1": 0.8147,
+        "soulap1": 0.9311,
+        "yeofly1": 0.8699
+      },
+      "per_species_std": {
+        "banana": 0.0515,
+        "coffal1": 0.0593,
+        "compau": 0.0249,
+        "fepowl": 0.0669,
+        "houspa": 0.0342,
+        "osprey": 0.091,
+        "rubthr1": 0.0533,
+        "socfly1": 0.0379,
+        "soulap1": 0.0392,
+        "yeofly1": 0.0585
+      },
+      "fold_info": [
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1067,
+          "n_val": 276,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1074,
+          "n_val": 269,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        }
+      ],
+      "duration_seconds": 14.3
+    },
+    "LogReg L2": {
+      "n_splits": 5,
+      "macro_roc_auc_mean": 0.8636,
+      "macro_roc_auc_std": 0.0092,
+      "macro_per_fold": [
+        0.8508,
+        0.871,
+        0.8586,
+        0.8733,
+        0.8644
+      ],
+      "per_species_mean": {
+        "banana": 0.904,
+        "coffal1": 0.8858,
+        "compau": 0.8846,
+        "fepowl": 0.7914,
+        "houspa": 0.9155,
+        "osprey": 0.7769,
+        "rubthr1": 0.8583,
+        "socfly1": 0.8201,
+        "soulap1": 0.9276,
+        "yeofly1": 0.8718
+      },
+      "per_species_std": {
+        "banana": 0.0358,
+        "coffal1": 0.0516,
+        "compau": 0.0339,
+        "fepowl": 0.0424,
+        "houspa": 0.0284,
+        "osprey": 0.0937,
+        "rubthr1": 0.0598,
+        "socfly1": 0.032,
+        "soulap1": 0.0265,
+        "yeofly1": 0.0715
+      },
+      "fold_info": [
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1067,
+          "n_val": 276,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1074,
+          "n_val": 269,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        }
+      ],
+      "duration_seconds": 6.3
+    }
+  },
+  "reference_lgbm_baseline_cv": {
+    "macro_roc_auc_mean": 0.8632,
+    "macro_roc_auc_std": 0.0174
+  },
+  "reference_lgbm_tuned_cv": {
+    "available": true,
+    "macro_roc_auc_cv_mean": 0.8869,
+    "macro_roc_auc_cv_std": 0.0236,
+    "macro_per_fold": [
+      0.8699,
+      0.8971,
+      0.8658,
+      0.9233,
+      0.8785
+    ]
+  }
+}

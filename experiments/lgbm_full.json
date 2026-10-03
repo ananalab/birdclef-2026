@@ -1,0 +1,44 @@
+{
+  "experiment_id": "lgbm_full",
+  "timestamp": "2026-05-16T23:10:31",
+  "duration_seconds": 49.0,
+  "config": {
+    "features_path": "data/processed/features_top10_n50_w3_all.parquet",
+    "n_estimators": 300,
+    "n_features": 969,
+    "model": "LightGBM one-vs-rest, params par defaut"
+  },
+  "dataset": {
+    "n_samples_total": 1343,
+    "n_samples_train": 1077,
+    "n_samples_val": 266,
+    "species": [
+      "banana",
+      "coffal1",
+      "compau",
+      "fepowl",
+      "houspa",
+      "osprey",
+      "rubthr1",
+      "socfly1",
+      "soulap1",
+      "yeofly1"
+    ]
+  },
+  "scores": {
+    "macro_roc_auc_val": 0.8981,
+    "per_species_roc_auc": {
+      "banana": 0.953,
+      "coffal1": 0.9176,
+      "compau": 0.9221,
+      "fepowl": 0.8368,
+      "houspa": 0.9012,
+      "osprey": 0.9155,
+      "rubthr1": 0.9048,
+      "socfly1": 0.7928,
+      "soulap1": 0.9602,
+      "yeofly1": 0.8772
+    }
+  },
+  "models_saved": false
+}

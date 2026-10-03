@@ -1,0 +1,113 @@
+{
+  "experiment_id": "cv_lgbm",
+  "timestamp": "2026-05-17T00:40:42",
+  "duration_seconds": 327.3,
+  "config": {
+    "features_path": "data/processed/features_top10_n50_w3_all.parquet",
+    "n_estimators": 300,
+    "n_splits": 5,
+    "model": "LightGBM one-vs-rest, params par defaut",
+    "cv_strategy": "StratifiedGroupKFold groupe par filename"
+  },
+  "dataset": {
+    "n_samples": 1343,
+    "n_features": 969,
+    "n_species": 10,
+    "species": [
+      "banana",
+      "coffal1",
+      "compau",
+      "fepowl",
+      "houspa",
+      "osprey",
+      "rubthr1",
+      "socfly1",
+      "soulap1",
+      "yeofly1"
+    ]
+  },
+  "cv_results": {
+    "n_splits": 5,
+    "macro_roc_auc_mean": 0.8632,
+    "macro_roc_auc_std": 0.0174,
+    "macro_per_fold": [
+      0.8478,
+      0.8721,
+      0.8492,
+      0.889,
+      0.8577
+    ],
+    "per_species_mean": {
+      "banana": 0.9064,
+      "coffal1": 0.902,
+      "compau": 0.896,
+      "fepowl": 0.8192,
+      "houspa": 0.9051,
+      "osprey": 0.752,
+      "rubthr1": 0.882,
+      "socfly1": 0.8127,
+      "soulap1": 0.9126,
+      "yeofly1": 0.8437
+    },
+    "per_species_std": {
+      "banana": 0.0501,
+      "coffal1": 0.0387,
+      "compau": 0.0321,
+      "fepowl": 0.0716,
+      "houspa": 0.0408,
+      "osprey": 0.0849,
+      "rubthr1": 0.0568,
+      "socfly1": 0.0816,
+      "soulap1": 0.055,
+      "yeofly1": 0.043
+    },
+    "fold_info": [
+      {
+        "n_train": 1077,
+        "n_val": 266,
+        "n_species_nan": 0,
+        "species_nan": []
+      },
+      {
+        "n_train": 1077,
+        "n_val": 266,
+        "n_species_nan": 0,
+        "species_nan": []
+      },
+      {
+        "n_train": 1067,
+        "n_val": 276,
+        "n_species_nan": 0,
+        "species_nan": []
+      },
+      {
+        "n_train": 1074,
+        "n_val": 269,
+        "n_species_nan": 0,
+        "species_nan": []
+      },
+      {
+        "n_train": 1077,
+        "n_val": 266,
+        "n_species_nan": 0,
+        "species_nan": []
+      }
+    ]
+  },
+  "single_split_reference": {
+    "macro_roc_auc": 0.8981,
+    "per_species": {
+      "banana": 0.953,
+      "coffal1": 0.9176,
+      "compau": 0.9221,
+      "fepowl": 0.8368,
+      "houspa": 0.9012,
+      "osprey": 0.9155,
+      "rubthr1": 0.9048,
+      "socfly1": 0.7928,
+      "soulap1": 0.9602,
+      "yeofly1": 0.8772
+    },
+    "note": "Comparaison directe avec experiments/lgbm_full.json (0.8981)"
+  }
+}

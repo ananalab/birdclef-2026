@@ -1,0 +1,828 @@
+{
+  "experiment_id": "optuna_lgbm",
+  "timestamp": "2026-05-17T01:37:58",
+  "duration_seconds": 8977.5,
+  "duration_minutes": 149.6,
+  "config": {
+    "features_path": "data/processed/features_top10_n50_w3_all.parquet",
+    "n_trials": 50,
+    "n_splits": 5,
+    "sampler": "TPESampler(n_startup_trials=10)",
+    "n_hyperparams_tuned": 7,
+    "hyperparams_tuned": [
+      "learning_rate",
+      "num_leaves",
+      "min_child_samples",
+      "feature_fraction",
+      "bagging_fraction",
+      "reg_lambda",
+      "n_estimators"
+    ]
+  },
+  "dataset": {
+    "n_samples": 1343,
+    "n_features": 969,
+    "n_species": 10,
+    "species": [
+      "banana",
+      "coffal1",
+      "compau",
+      "fepowl",
+      "houspa",
+      "osprey",
+      "rubthr1",
+      "socfly1",
+      "soulap1",
+      "yeofly1"
+    ]
+  },
+  "best_trial": {
+    "number": 11,
+    "macro_roc_auc_cv_mean": 0.8869,
+    "macro_roc_auc_cv_std": 0.0236,
+    "macro_per_fold": [
+      0.8699,
+      0.8971,
+      0.8658,
+      0.9233,
+      0.8785
+    ],
+    "best_params": {
+      "learning_rate": 0.031598904088614266,
+      "num_leaves": 52,
+      "min_child_samples": 99,
+      "feature_fraction": 0.5043736834843053,
+      "bagging_fraction": 0.8386022073719704,
+      "reg_lambda": 0.0012418212934213733,
+      "n_estimators": 751
+    }
+  },
+  "reference_baseline_cv": {
+    "macro_roc_auc_mean": 0.8632,
+    "macro_roc_auc_std": 0.0174,
+    "note": "Run sans tuning (params LightGBM defaut)."
+  },
+  "param_importance_fanova": {
+    "learning_rate": 0.4188,
+    "n_estimators": 0.3366,
+    "bagging_fraction": 0.0859,
+    "min_child_samples": 0.082,
+    "feature_fraction": 0.043,
+    "num_leaves": 0.0317,
+    "reg_lambda": 0.0019
+  },
+  "all_trials": [
+    {
+      "number": 0,
+      "value": 0.8644,
+      "params": {
+        "learning_rate": 0.023172,
+        "num_leaves": 216,
+        "min_child_samples": 33,
+        "feature_fraction": 0.799329,
+        "bagging_fraction": 0.578009,
+        "reg_lambda": 0.004207,
+        "n_estimators": 152
+      },
+      "macro_std": 0.0197,
+      "state": "1"
+    },
+    {
+      "number": 1,
+      "value": 0.8779,
+      "params": {
+        "learning_rate": 0.173445,
+        "num_leaves": 63,
+        "min_child_samples": 29,
+        "feature_fraction": 0.510292,
+        "bagging_fraction": 0.984955,
+        "reg_lambda": 2.136833,
+        "n_estimators": 291
+      },
+      "macro_std": 0.0226,
+      "state": "1"
+    },
+    {
+      "number": 2,
+      "value": 0.8698,
+      "params": {
+        "learning_rate": 0.010526,
+        "num_leaves": 14,
+        "min_child_samples": 5,
+        "feature_fraction": 0.762378,
+        "bagging_fraction": 0.715973,
+        "reg_lambda": 0.014619,
+        "n_estimators": 651
+      },
+      "macro_std": 0.0193,
+      "state": "1"
+    },
+    {
+      "number": 3,
+      "value": 0.8495,
+      "params": {
+        "learning_rate": 0.008851,
+        "num_leaves": 21,
+        "min_child_samples": 7,
+        "feature_fraction": 0.728035,
+        "bagging_fraction": 0.892588,
+        "reg_lambda": 0.006291,
+        "n_estimators": 563
+      },
+      "macro_std": 0.0172,
+      "state": "1"
+    },
+    {
+      "number": 4,
+      "value": 0.8825,
+      "params": {
+        "learning_rate": 0.056542,
+        "num_leaves": 9,
+        "min_child_samples": 19,
+        "feature_fraction": 0.585262,
+        "bagging_fraction": 0.532526,
+        "reg_lambda": 6.24514,
+        "n_estimators": 970
+      },
+      "macro_std": 0.0198,
+      "state": "1"
+    },
+    {
+      "number": 5,
+      "value": 0.8785,
+      "params": {
+        "learning_rate": 0.136906,
+        "num_leaves": 22,
+        "min_child_samples": 2,
+        "feature_fraction": 0.842117,
+        "bagging_fraction": 0.720076,
+        "reg_lambda": 0.003077,
+        "n_estimators": 546
+      },
+      "macro_std": 0.0192,
+      "state": "1"
+    },
+    {
+      "number": 6,
+      "value": 0.8193,
+      "params": {
+        "learning_rate": 0.005756,
+        "num_leaves": 186,
+        "min_child_samples": 4,
+        "feature_fraction": 0.831261,
+        "bagging_fraction": 0.655856,
+        "reg_lambda": 0.120302,
+        "n_estimators": 592
+      },
+      "macro_std": 0.0147,
+      "state": "1"
+    },
+    {
+      "number": 7,
+      "value": 0.8768,
+      "params": {
+        "learning_rate": 0.010658,
+        "num_leaves": 230,
+        "min_child_samples": 39,
+        "feature_fraction": 0.969749,
+        "bagging_fraction": 0.947414,
+        "reg_lambda": 0.246377,
+        "n_estimators": 930
+      },
+      "macro_std": 0.0199,
+      "state": "1"
+    },
+    {
+      "number": 8,
+      "value": 0.8654,
+      "params": {
+        "learning_rate": 0.007183,
+        "num_leaves": 15,
+        "min_child_samples": 2,
+        "feature_fraction": 0.662665,
+        "bagging_fraction": 0.694339,
+        "reg_lambda": 0.012173,
+        "n_estimators": 846
+      },
+      "macro_std": 0.0175,
+      "state": "1"
+    },
+    {
+      "number": 9,
+      "value": 0.884,
+      "params": {
+        "learning_rate": 0.021544,
+        "num_leaves": 20,
+        "min_child_samples": 15,
+        "feature_fraction": 0.570462,
+        "bagging_fraction": 0.901098,
+        "reg_lambda": 0.001987,
+        "n_estimators": 989
+      },
+      "macro_std": 0.0173,
+      "state": "1"
+    },
+    {
+      "number": 10,
+      "value": 0.8864,
+      "params": {
+        "learning_rate": 0.034444,
+        "num_leaves": 53,
+        "min_child_samples": 88,
+        "feature_fraction": 0.508981,
+        "bagging_fraction": 0.841554,
+        "reg_lambda": 0.001429,
+        "n_estimators": 758
+      },
+      "macro_std": 0.0219,
+      "state": "1"
+    },
+    {
+      "number": 11,
+      "value": 0.8869,
+      "params": {
+        "learning_rate": 0.031599,
+        "num_leaves": 52,
+        "min_child_samples": 99,
+        "feature_fraction": 0.504374,
+        "bagging_fraction": 0.838602,
+        "reg_lambda": 0.001242,
+        "n_estimators": 751
+      },
+      "macro_std": 0.0236,
+      "state": "1"
+    },
+    {
+      "number": 12,
+      "value": 0.886,
+      "params": {
+        "learning_rate": 0.059227,
+        "num_leaves": 60,
+        "min_child_samples": 98,
+        "feature_fraction": 0.502109,
+        "bagging_fraction": 0.803387,
+        "reg_lambda": 0.001035,
+        "n_estimators": 758
+      },
+      "macro_std": 0.0229,
+      "state": "1"
+    },
+    {
+      "number": 13,
+      "value": 0.8852,
+      "params": {
+        "learning_rate": 0.038556,
+        "num_leaves": 115,
+        "min_child_samples": 84,
+        "feature_fraction": 0.628456,
+        "bagging_fraction": 0.796326,
+        "reg_lambda": 0.040727,
+        "n_estimators": 741
+      },
+      "macro_std": 0.0214,
+      "state": "1"
+    },
+    {
+      "number": 14,
+      "value": 0.8796,
+      "params": {
+        "learning_rate": 0.096925,
+        "num_leaves": 38,
+        "min_child_samples": 58,
+        "feature_fraction": 0.66367,
+        "bagging_fraction": 0.839078,
+        "reg_lambda": 0.450428,
+        "n_estimators": 427
+      },
+      "macro_std": 0.0207,
+      "state": "1"
+    },
+    {
+      "number": 15,
+      "value": 0.8787,
+      "params": {
+        "learning_rate": 0.276205,
+        "num_leaves": 39,
+        "min_child_samples": 57,
+        "feature_fraction": 0.56421,
+        "bagging_fraction": 0.856434,
+        "reg_lambda": 0.029479,
+        "n_estimators": 777
+      },
+      "macro_std": 0.0231,
+      "state": "1"
+    },
+    {
+      "number": 16,
+      "value": 0.8796,
+      "params": {
+        "learning_rate": 0.02737,
+        "num_leaves": 99,
+        "min_child_samples": 53,
+        "feature_fraction": 0.928696,
+        "bagging_fraction": 0.789783,
+        "reg_lambda": 0.001024,
+        "n_estimators": 436
+      },
+      "macro_std": 0.0206,
+      "state": "1"
+    },
+    {
+      "number": 17,
+      "value": 0.8807,
+      "params": {
+        "learning_rate": 0.056526,
+        "num_leaves": 63,
+        "min_child_samples": 9,
+        "feature_fraction": 0.502647,
+        "bagging_fraction": 0.921511,
+        "reg_lambda": 0.01173,
+        "n_estimators": 845
+      },
+      "macro_std": 0.0173,
+      "state": "1"
+    },
+    {
+      "number": 18,
+      "value": 0.8801,
+      "params": {
+        "learning_rate": 0.017115,
+        "num_leaves": 101,
+        "min_child_samples": 21,
+        "feature_fraction": 0.703864,
+        "bagging_fraction": 0.65485,
+        "reg_lambda": 0.808833,
+        "n_estimators": 665
+      },
+      "macro_std": 0.019,
+      "state": "1"
+    },
+    {
+      "number": 19,
+      "value": 0.8842,
+      "params": {
+        "learning_rate": 0.015406,
+        "num_leaves": 29,
+        "min_child_samples": 91,
+        "feature_fraction": 0.609494,
+        "bagging_fraction": 0.855625,
+        "reg_lambda": 0.055514,
+        "n_estimators": 846
+      },
+      "macro_std": 0.0235,
+      "state": "1"
+    },
+    {
+      "number": 20,
+      "value": 0.8808,
+      "params": {
+        "learning_rate": 0.040291,
+        "num_leaves": 54,
+        "min_child_samples": 61,
+        "feature_fraction": 0.543978,
+        "bagging_fraction": 0.775285,
+        "reg_lambda": 0.002103,
+        "n_estimators": 475
+      },
+      "macro_std": 0.0223,
+      "state": "1"
+    },
+    {
+      "number": 21,
+      "value": 0.8854,
+      "params": {
+        "learning_rate": 0.071929,
+        "num_leaves": 75,
+        "min_child_samples": 94,
+        "feature_fraction": 0.505438,
+        "bagging_fraction": 0.830763,
+        "reg_lambda": 0.001107,
+        "n_estimators": 706
+      },
+      "macro_std": 0.0211,
+      "state": "1"
+    },
+    {
+      "number": 22,
+      "value": 0.8851,
+      "params": {
+        "learning_rate": 0.035883,
+        "num_leaves": 41,
+        "min_child_samples": 99,
+        "feature_fraction": 0.531519,
+        "bagging_fraction": 0.807942,
+        "reg_lambda": 0.004962,
+        "n_estimators": 790
+      },
+      "macro_std": 0.0227,
+      "state": "1"
+    },
+    {
+      "number": 23,
+      "value": 0.8826,
+      "params": {
+        "learning_rate": 0.071718,
+        "num_leaves": 125,
+        "min_child_samples": 41,
+        "feature_fraction": 0.63018,
+        "bagging_fraction": 0.750198,
+        "reg_lambda": 0.001146,
+        "n_estimators": 886
+      },
+      "macro_std": 0.0192,
+      "state": "1"
+    },
+    {
+      "number": 24,
+      "value": 0.8831,
+      "params": {
+        "learning_rate": 0.031098,
+        "num_leaves": 29,
+        "min_child_samples": 60,
+        "feature_fraction": 0.551902,
+        "bagging_fraction": 0.868147,
+        "reg_lambda": 0.002319,
+        "n_estimators": 660
+      },
+      "macro_std": 0.0224,
+      "state": "1"
+    },
+    {
+      "number": 25,
+      "value": 0.8823,
+      "params": {
+        "learning_rate": 0.050167,
+        "num_leaves": 76,
+        "min_child_samples": 28,
+        "feature_fraction": 0.594257,
+        "bagging_fraction": 0.96783,
+        "reg_lambda": 0.004682,
+        "n_estimators": 771
+      },
+      "macro_std": 0.0227,
+      "state": "1"
+    },
+    {
+      "number": 26,
+      "value": 0.8812,
+      "params": {
+        "learning_rate": 0.095291,
+        "num_leaves": 51,
+        "min_child_samples": 78,
+        "feature_fraction": 0.540584,
+        "bagging_fraction": 0.931324,
+        "reg_lambda": 0.008992,
+        "n_estimators": 614
+      },
+      "macro_std": 0.0219,
+      "state": "1"
+    },
+    {
+      "number": 27,
+      "value": 0.877,
+      "params": {
+        "learning_rate": 0.015802,
+        "num_leaves": 33,
+        "min_child_samples": 39,
+        "feature_fraction": 0.670676,
+        "bagging_fraction": 0.754819,
+        "reg_lambda": 0.022959,
+        "n_estimators": 707
+      },
+      "macro_std": 0.0219,
+      "state": "1"
+    },
+    {
+      "number": 28,
+      "value": 0.8838,
+      "params": {
+        "learning_rate": 0.047462,
+        "num_leaves": 158,
+        "min_child_samples": 72,
+        "feature_fraction": 0.612563,
+        "bagging_fraction": 0.815781,
+        "reg_lambda": 0.001854,
+        "n_estimators": 895
+      },
+      "macro_std": 0.0206,
+      "state": "1"
+    },
+    {
+      "number": 29,
+      "value": 0.8795,
+      "params": {
+        "learning_rate": 0.024678,
+        "num_leaves": 75,
+        "min_child_samples": 23,
+        "feature_fraction": 0.500748,
+        "bagging_fraction": 0.887317,
+        "reg_lambda": 0.002975,
+        "n_estimators": 507
+      },
+      "macro_std": 0.0201,
+      "state": "1"
+    },
+    {
+      "number": 30,
+      "value": 0.8554,
+      "params": {
+        "learning_rate": 0.020336,
+        "num_leaves": 50,
+        "min_child_samples": 39,
+        "feature_fraction": 0.86496,
+        "bagging_fraction": 0.634702,
+        "reg_lambda": 0.006007,
+        "n_estimators": 119
+      },
+      "macro_std": 0.0231,
+      "state": "1"
+    },
+    {
+      "number": 31,
+      "value": 0.8854,
+      "params": {
+        "learning_rate": 0.079352,
+        "num_leaves": 81,
+        "min_child_samples": 97,
+        "feature_fraction": 0.532879,
+        "bagging_fraction": 0.828167,
+        "reg_lambda": 0.001113,
+        "n_estimators": 713
+      },
+      "macro_std": 0.0216,
+      "state": "1"
+    },
+    {
+      "number": 32,
+      "value": 0.8829,
+      "params": {
+        "learning_rate": 0.136257,
+        "num_leaves": 62,
+        "min_child_samples": 72,
+        "feature_fraction": 0.500137,
+        "bagging_fraction": 0.767523,
+        "reg_lambda": 0.001086,
+        "n_estimators": 715
+      },
+      "macro_std": 0.0205,
+      "state": "1"
+    },
+    {
+      "number": 33,
+      "value": 0.8789,
+      "params": {
+        "learning_rate": 0.07995,
+        "num_leaves": 93,
+        "min_child_samples": 49,
+        "feature_fraction": 0.527862,
+        "bagging_fraction": 0.834655,
+        "reg_lambda": 0.003673,
+        "n_estimators": 220
+      },
+      "macro_std": 0.0221,
+      "state": "1"
+    },
+    {
+      "number": 34,
+      "value": 0.8849,
+      "params": {
+        "learning_rate": 0.062107,
+        "num_leaves": 135,
+        "min_child_samples": 73,
+        "feature_fraction": 0.574521,
+        "bagging_fraction": 0.707438,
+        "reg_lambda": 0.001628,
+        "n_estimators": 807
+      },
+      "macro_std": 0.0207,
+      "state": "1"
+    },
+    {
+      "number": 35,
+      "value": 0.8818,
+      "params": {
+        "learning_rate": 0.031566,
+        "num_leaves": 46,
+        "min_child_samples": 30,
+        "feature_fraction": 0.520859,
+        "bagging_fraction": 0.988648,
+        "reg_lambda": 0.007646,
+        "n_estimators": 636
+      },
+      "macro_std": 0.0225,
+      "state": "1"
+    },
+    {
+      "number": 36,
+      "value": 0.8782,
+      "params": {
+        "learning_rate": 0.118082,
+        "num_leaves": 64,
+        "min_child_samples": 49,
+        "feature_fraction": 0.775797,
+        "bagging_fraction": 0.869384,
+        "reg_lambda": 2.871945,
+        "n_estimators": 335
+      },
+      "macro_std": 0.0224,
+      "state": "1"
+    },
+    {
+      "number": 37,
+      "value": 0.8849,
+      "params": {
+        "learning_rate": 0.043303,
+        "num_leaves": 60,
+        "min_child_samples": 96,
+        "feature_fraction": 0.585165,
+        "bagging_fraction": 0.729838,
+        "reg_lambda": 0.003415,
+        "n_estimators": 670
+      },
+      "macro_std": 0.0222,
+      "state": "1"
+    },
+    {
+      "number": 38,
+      "value": 0.876,
+      "params": {
+        "learning_rate": 0.198977,
+        "num_leaves": 25,
+        "min_child_samples": 4,
+        "feature_fraction": 0.559659,
+        "bagging_fraction": 0.511694,
+        "reg_lambda": 0.107625,
+        "n_estimators": 581
+      },
+      "macro_std": 0.0214,
+      "state": "1"
+    },
+    {
+      "number": 39,
+      "value": 0.8823,
+      "params": {
+        "learning_rate": 0.012262,
+        "num_leaves": 8,
+        "min_child_samples": 68,
+        "feature_fraction": 0.702117,
+        "bagging_fraction": 0.911232,
+        "reg_lambda": 0.001739,
+        "n_estimators": 936
+      },
+      "macro_std": 0.0236,
+      "state": "1"
+    },
+    {
+      "number": 40,
+      "value": 0.8746,
+      "params": {
+        "learning_rate": 0.06352,
+        "num_leaves": 76,
+        "min_child_samples": 6,
+        "feature_fraction": 0.63057,
+        "bagging_fraction": 0.885545,
+        "reg_lambda": 0.020533,
+        "n_estimators": 543
+      },
+      "macro_std": 0.0198,
+      "state": "1"
+    },
+    {
+      "number": 41,
+      "value": 0.8852,
+      "params": {
+        "learning_rate": 0.082443,
+        "num_leaves": 83,
+        "min_child_samples": 98,
+        "feature_fraction": 0.524344,
+        "bagging_fraction": 0.830418,
+        "reg_lambda": 0.001127,
+        "n_estimators": 730
+      },
+      "macro_std": 0.0228,
+      "state": "1"
+    },
+    {
+      "number": 42,
+      "value": 0.8835,
+      "params": {
+        "learning_rate": 0.105447,
+        "num_leaves": 90,
+        "min_child_samples": 79,
+        "feature_fraction": 0.54403,
+        "bagging_fraction": 0.8182,
+        "reg_lambda": 0.001612,
+        "n_estimators": 687
+      },
+      "macro_std": 0.0208,
+      "state": "1"
+    },
+    {
+      "number": 43,
+      "value": 0.8802,
+      "params": {
+        "learning_rate": 0.051688,
+        "num_leaves": 68,
+        "min_child_samples": 11,
+        "feature_fraction": 0.518889,
+        "bagging_fraction": 0.796844,
+        "reg_lambda": 0.002938,
+        "n_estimators": 749
+      },
+      "macro_std": 0.0191,
+      "state": "1"
+    },
+    {
+      "number": 44,
+      "value": 0.8849,
+      "params": {
+        "learning_rate": 0.165026,
+        "num_leaves": 45,
+        "min_child_samples": 86,
+        "feature_fraction": 0.561401,
+        "bagging_fraction": 0.786375,
+        "reg_lambda": 0.001562,
+        "n_estimators": 817
+      },
+      "macro_std": 0.0217,
+      "state": "1"
+    },
+    {
+      "number": 45,
+      "value": 0.8797,
+      "params": {
+        "learning_rate": 0.066935,
+        "num_leaves": 35,
+        "min_child_samples": 47,
+        "feature_fraction": 0.592379,
+        "bagging_fraction": 0.835675,
+        "reg_lambda": 8.460894,
+        "n_estimators": 886
+      },
+      "macro_std": 0.0211,
+      "state": "1"
+    },
+    {
+      "number": 46,
+      "value": 0.8845,
+      "params": {
+        "learning_rate": 0.033555,
+        "num_leaves": 160,
+        "min_child_samples": 100,
+        "feature_fraction": 0.520428,
+        "bagging_fraction": 0.850252,
+        "reg_lambda": 0.002679,
+        "n_estimators": 613
+      },
+      "macro_std": 0.024,
+      "state": "1"
+    },
+    {
+      "number": 47,
+      "value": 0.8823,
+      "params": {
+        "learning_rate": 0.079329,
+        "num_leaves": 17,
+        "min_child_samples": 16,
+        "feature_fraction": 0.545697,
+        "bagging_fraction": 0.736593,
+        "reg_lambda": 0.004661,
+        "n_estimators": 747
+      },
+      "macro_std": 0.0192,
+      "state": "1"
+    },
+    {
+      "number": 48,
+      "value": 0.8798,
+      "params": {
+        "learning_rate": 0.02482,
+        "num_leaves": 107,
+        "min_child_samples": 66,
+        "feature_fraction": 0.994736,
+        "bagging_fraction": 0.94752,
+        "reg_lambda": 0.001077,
+        "n_estimators": 816
+      },
+      "macro_std": 0.0217,
+      "state": "1"
+    },
+    {
+      "number": 49,
+      "value": 0.8836,
+      "params": {
+        "learning_rate": 0.044058,
+        "num_leaves": 11,
+        "min_child_samples": 3,
+        "feature_fraction": 0.500725,
+        "bagging_fraction": 0.6817,
+        "reg_lambda": 0.068921,
+        "n_estimators": 700
+      },
+      "macro_std": 0.019,
+      "state": "1"
+    }
+  ],
+  "model_saved": true,
+  "model_path": "/Users/anaisazouaoui/Desktop/BIRDCLEF_PROJECT/models/optuna_lgbm"
+}

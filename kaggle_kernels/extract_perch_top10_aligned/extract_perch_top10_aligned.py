@@ -1,0 +1,650 @@
+"""Extraction Perch v8 ALIGNEE sur la liste exacte du parquet local.
+
+Different de extract_perch_top10.py par un seul aspect : au lieu d'echantillonner
+50 fichiers par espece avec un seed (qui donne des fichiers differents entre
+local et Kaggle a cause de differences dans train.csv), on utilise la liste
+EXACTE des fichiers du parquet local data/processed/features_top10_n50_w3_all.parquet.
+
+Pour chaque fichier, on extrait exactement le meme nombre de fenetres qu'en
+local (1 a 3 selon la duree du fichier).
+
+Objectif : eliminer le confounding factor "echantillonnage different" dans la
+comparaison features manuelles vs embeddings Perch (Session 3.5 corrigee).
+"""
+import sys
+import time
+from pathlib import Path
+
+import librosa
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+import tensorflow_hub as hub
+
+
+DATA_ROOT = Path("/kaggle/input/competitions/birdclef-2026")
+MODEL_PATH = "/kaggle/input/models/google/bird-vocalization-classifier/tensorflow2/bird-vocalization-classifier/8"
+OUTPUT_DIR = Path("/kaggle/working")
+
+SAMPLE_RATE = 32_000
+WINDOW_DURATION = 5.0
+WINDOW_SAMPLES = int(SAMPLE_RATE * WINDOW_DURATION)
+
+
+# --- Liste exacte des fichiers a extraire ---
+# Format : {filename: [window_idx, ...]} avec window_idx contigus a partir de 0.
+# Generee a partir du parquet local.
+FILE_TO_WINDOWS = {
+    "banana/XC1069084.ogg": [0, 1, 2],
+    "banana/XC147123.ogg": [0, 1, 2],
+    "banana/XC169559.ogg": [0, 1, 2],
+    "banana/XC173565.ogg": [0, 1, 2],
+    "banana/XC196936.ogg": [0, 1, 2],
+    "banana/XC215676.ogg": [0, 1, 2],
+    "banana/XC242441.ogg": [0, 1, 2],
+    "banana/XC259502.ogg": [0, 1, 2],
+    "banana/XC262502.ogg": [0, 1, 2],
+    "banana/XC284997.ogg": [0, 1, 2],
+    "banana/XC308452.ogg": [0, 1, 2],
+    "banana/XC331385.ogg": [0, 1, 2],
+    "banana/XC347839.ogg": [0, 1, 2],
+    "banana/XC403852.ogg": [0, 1, 2],
+    "banana/XC421240.ogg": [0, 1, 2],
+    "banana/XC430035.ogg": [0, 1, 2],
+    "banana/XC4311.ogg": [0, 1, 2],
+    "banana/XC455324.ogg": [0, 1, 2],
+    "banana/XC46632.ogg": [0, 1, 2],
+    "banana/XC520823.ogg": [0, 1, 2],
+    "banana/XC561261.ogg": [0],
+    "banana/XC58865.ogg": [0, 1, 2],
+    "banana/XC59515.ogg": [0, 1, 2],
+    "banana/XC649625.ogg": [0, 1, 2],
+    "banana/XC697123.ogg": [0, 1, 2],
+    "banana/XC768806.ogg": [0, 1],
+    "banana/XC814348.ogg": [0, 1, 2],
+    "banana/XC939057.ogg": [0, 1, 2],
+    "banana/XC939064.ogg": [0, 1],
+    "banana/XC946049.ogg": [0, 1],
+    "banana/XC952286.ogg": [0, 1, 2],
+    "banana/XC956109.ogg": [0, 1, 2],
+    "banana/XC971449.ogg": [0, 1, 2],
+    "banana/iNat1003999.ogg": [0, 1, 2],
+    "banana/iNat1564205.ogg": [0, 1, 2],
+    "banana/iNat1634628.ogg": [0, 1, 2],
+    "banana/iNat1645079.ogg": [0, 1],
+    "banana/iNat1711277.ogg": [0, 1],
+    "banana/iNat32317.ogg": [0, 1],
+    "banana/iNat335243.ogg": [0],
+    "banana/iNat368645.ogg": [0, 1, 2],
+    "banana/iNat483177.ogg": [0, 1, 2],
+    "banana/iNat578077.ogg": [0, 1, 2],
+    "banana/iNat597011.ogg": [0, 1, 2],
+    "banana/iNat613793.ogg": [0, 1, 2],
+    "banana/iNat615009.ogg": [0, 1],
+    "banana/iNat635383.ogg": [0],
+    "banana/iNat724173.ogg": [0, 1, 2],
+    "banana/iNat964607.ogg": [0, 1, 2],
+    "banana/iNat998528.ogg": [0, 1],
+    "coffal1/XC1011212.ogg": [0, 1, 2],
+    "coffal1/XC1012428.ogg": [0, 1, 2],
+    "coffal1/XC1016511.ogg": [0, 1, 2],
+    "coffal1/XC114364.ogg": [0, 1, 2],
+    "coffal1/XC122697.ogg": [0, 1, 2],
+    "coffal1/XC144163.ogg": [0, 1, 2],
+    "coffal1/XC151949.ogg": [0, 1, 2],
+    "coffal1/XC155512.ogg": [0, 1, 2],
+    "coffal1/XC173578.ogg": [0, 1],
+    "coffal1/XC185.ogg": [0, 1, 2],
+    "coffal1/XC2231.ogg": [0, 1, 2],
+    "coffal1/XC238626.ogg": [0, 1, 2],
+    "coffal1/XC308814.ogg": [0, 1],
+    "coffal1/XC355859.ogg": [0, 1, 2],
+    "coffal1/XC381877.ogg": [0, 1, 2],
+    "coffal1/XC388220.ogg": [0, 1, 2],
+    "coffal1/XC394839.ogg": [0, 1, 2],
+    "coffal1/XC420105.ogg": [0, 1, 2],
+    "coffal1/XC474545.ogg": [0, 1, 2],
+    "coffal1/XC498118.ogg": [0, 1, 2],
+    "coffal1/XC514068.ogg": [0, 1],
+    "coffal1/XC516393.ogg": [0, 1, 2],
+    "coffal1/XC518849.ogg": [0, 1, 2],
+    "coffal1/XC582177.ogg": [0, 1, 2],
+    "coffal1/XC586367.ogg": [0, 1, 2],
+    "coffal1/XC640029.ogg": [0, 1, 2],
+    "coffal1/XC65603.ogg": [0, 1, 2],
+    "coffal1/XC751222.ogg": [0, 1, 2],
+    "coffal1/XC754104.ogg": [0, 1],
+    "coffal1/XC909256.ogg": [0, 1],
+    "coffal1/XC925772.ogg": [0, 1, 2],
+    "coffal1/XC951733.ogg": [0, 1, 2],
+    "coffal1/XC957243.ogg": [0, 1, 2],
+    "coffal1/iNat1136478.ogg": [0, 1, 2],
+    "coffal1/iNat1167591.ogg": [0],
+    "coffal1/iNat156108.ogg": [0, 1, 2],
+    "coffal1/iNat161590.ogg": [0, 1, 2],
+    "coffal1/iNat252353.ogg": [0, 1, 2],
+    "coffal1/iNat293950.ogg": [0, 1, 2],
+    "coffal1/iNat311243.ogg": [0, 1, 2],
+    "coffal1/iNat363914.ogg": [0, 1, 2],
+    "coffal1/iNat399170.ogg": [0, 1, 2],
+    "coffal1/iNat531733.ogg": [0, 1, 2],
+    "coffal1/iNat539095.ogg": [0, 1, 2],
+    "coffal1/iNat54413.ogg": [0, 1, 2],
+    "coffal1/iNat546006.ogg": [0, 1],
+    "coffal1/iNat789513.ogg": [0, 1, 2],
+    "coffal1/iNat828678.ogg": [0, 1, 2],
+    "coffal1/iNat858666.ogg": [0, 1],
+    "coffal1/iNat916428.ogg": [0, 1],
+    "compau/XC1035712.ogg": [0, 1, 2],
+    "compau/XC127688.ogg": [0, 1, 2],
+    "compau/XC166197.ogg": [0, 1, 2],
+    "compau/XC221567.ogg": [0, 1, 2],
+    "compau/XC238687.ogg": [0, 1, 2],
+    "compau/XC257771.ogg": [0, 1, 2],
+    "compau/XC257773.ogg": [0, 1, 2],
+    "compau/XC265244.ogg": [0, 1, 2],
+    "compau/XC285285.ogg": [0, 1, 2],
+    "compau/XC334335.ogg": [0, 1, 2],
+    "compau/XC350068.ogg": [0, 1, 2],
+    "compau/XC421914.ogg": [0, 1],
+    "compau/XC427477.ogg": [0, 1, 2],
+    "compau/XC500143.ogg": [0, 1, 2],
+    "compau/XC511762.ogg": [0, 1, 2],
+    "compau/XC525626.ogg": [0, 1, 2],
+    "compau/XC687806.ogg": [0, 1, 2],
+    "compau/XC742722.ogg": [0, 1, 2],
+    "compau/XC871661.ogg": [0, 1, 2],
+    "compau/iNat1148601.ogg": [0, 1, 2],
+    "compau/iNat1177366.ogg": [0, 1, 2],
+    "compau/iNat1192928.ogg": [0, 1, 2],
+    "compau/iNat1242998.ogg": [0],
+    "compau/iNat1321681.ogg": [0],
+    "compau/iNat1584558.ogg": [0, 1, 2],
+    "compau/iNat1611053.ogg": [0, 1, 2],
+    "compau/iNat1632870.ogg": [0, 1, 2],
+    "compau/iNat1645105.ogg": [0, 1, 2],
+    "compau/iNat166506.ogg": [0, 1, 2],
+    "compau/iNat226671.ogg": [0, 1, 2],
+    "compau/iNat286280.ogg": [0, 1, 2],
+    "compau/iNat307534.ogg": [0, 1, 2],
+    "compau/iNat34130.ogg": [0, 1, 2],
+    "compau/iNat373873.ogg": [0, 1, 2],
+    "compau/iNat443284.ogg": [0, 1, 2],
+    "compau/iNat448048.ogg": [0, 1, 2],
+    "compau/iNat558586.ogg": [0, 1, 2],
+    "compau/iNat589642.ogg": [0, 1, 2],
+    "compau/iNat595475.ogg": [0, 1, 2],
+    "compau/iNat628788.ogg": [0, 1, 2],
+    "compau/iNat667246.ogg": [0, 1],
+    "compau/iNat714050.ogg": [0, 1, 2],
+    "compau/iNat742715.ogg": [0, 1, 2],
+    "compau/iNat857779.ogg": [0, 1, 2],
+    "compau/iNat882322.ogg": [0, 1, 2],
+    "compau/iNat887681.ogg": [0, 1, 2],
+    "compau/iNat908725.ogg": [0, 1, 2],
+    "compau/iNat922687.ogg": [0, 1, 2],
+    "compau/iNat973186.ogg": [0, 1],
+    "compau/iNat977574.ogg": [0, 1, 2],
+    "fepowl/XC131328.ogg": [0, 1, 2],
+    "fepowl/XC185357.ogg": [0, 1, 2],
+    "fepowl/XC2220.ogg": [0, 1, 2],
+    "fepowl/XC378360.ogg": [0, 1, 2],
+    "fepowl/XC389255.ogg": [0, 1],
+    "fepowl/XC447867.ogg": [0, 1, 2],
+    "fepowl/XC453557.ogg": [0, 1, 2],
+    "fepowl/XC457513.ogg": [0, 1, 2],
+    "fepowl/XC483048.ogg": [0, 1, 2],
+    "fepowl/XC496927.ogg": [0, 1, 2],
+    "fepowl/XC504299.ogg": [0, 1, 2],
+    "fepowl/XC533594.ogg": [0, 1],
+    "fepowl/XC539274.ogg": [0, 1, 2],
+    "fepowl/XC547130.ogg": [0, 1, 2],
+    "fepowl/XC592536.ogg": [0, 1, 2],
+    "fepowl/XC698604.ogg": [0, 1, 2],
+    "fepowl/XC738931.ogg": [0, 1, 2],
+    "fepowl/XC749740.ogg": [0, 1, 2],
+    "fepowl/XC807771.ogg": [0, 1],
+    "fepowl/XC872236.ogg": [0, 1, 2],
+    "fepowl/iNat1193886.ogg": [0, 1, 2],
+    "fepowl/iNat1224414.ogg": [0, 1, 2],
+    "fepowl/iNat124261.ogg": [0, 1],
+    "fepowl/iNat1270413.ogg": [0, 1, 2],
+    "fepowl/iNat1307393.ogg": [0, 1, 2],
+    "fepowl/iNat1344951.ogg": [0, 1, 2],
+    "fepowl/iNat1374284.ogg": [0, 1, 2],
+    "fepowl/iNat150284.ogg": [0, 1],
+    "fepowl/iNat1631059.ogg": [0, 1, 2],
+    "fepowl/iNat1645527.ogg": [0, 1, 2],
+    "fepowl/iNat1658258.ogg": [0, 1, 2],
+    "fepowl/iNat30456.ogg": [0, 1],
+    "fepowl/iNat353237.ogg": [0, 1, 2],
+    "fepowl/iNat353491.ogg": [0, 1, 2],
+    "fepowl/iNat361503.ogg": [0, 1, 2],
+    "fepowl/iNat364755.ogg": [0, 1, 2],
+    "fepowl/iNat380252.ogg": [0, 1, 2],
+    "fepowl/iNat380288.ogg": [0, 1, 2],
+    "fepowl/iNat412172.ogg": [0, 1, 2],
+    "fepowl/iNat452473.ogg": [0, 1, 2],
+    "fepowl/iNat476044.ogg": [0, 1, 2],
+    "fepowl/iNat516281.ogg": [0],
+    "fepowl/iNat562444.ogg": [0, 1, 2],
+    "fepowl/iNat581441.ogg": [0, 1, 2],
+    "fepowl/iNat582007.ogg": [0, 1, 2],
+    "fepowl/iNat587003.ogg": [0, 1, 2],
+    "fepowl/iNat605678.ogg": [0],
+    "fepowl/iNat714513.ogg": [0, 1, 2],
+    "fepowl/iNat723602.ogg": [0, 1, 2],
+    "fepowl/iNat748757.ogg": [0, 1],
+    "houspa/XC322518.ogg": [0, 1, 2],
+    "houspa/XC357671.ogg": [0, 1, 2],
+    "houspa/XC388296.ogg": [0, 1, 2],
+    "houspa/XC553005.ogg": [0, 1, 2],
+    "houspa/XC570608.ogg": [0, 1, 2],
+    "houspa/XC629852.ogg": [0, 1, 2],
+    "houspa/XC697261.ogg": [0, 1, 2],
+    "houspa/XC741845.ogg": [0, 1],
+    "houspa/XC775840.ogg": [0, 1, 2],
+    "houspa/XC807192.ogg": [0, 1, 2],
+    "houspa/XC819764.ogg": [0, 1, 2],
+    "houspa/XC823481.ogg": [0, 1, 2],
+    "houspa/XC998178.ogg": [0, 1, 2],
+    "houspa/iNat1017375.ogg": [0, 1, 2],
+    "houspa/iNat1018099.ogg": [0, 1, 2],
+    "houspa/iNat1023463.ogg": [0, 1, 2],
+    "houspa/iNat1033766.ogg": [0, 1, 2],
+    "houspa/iNat1055728.ogg": [0, 1, 2],
+    "houspa/iNat1074542.ogg": [0, 1],
+    "houspa/iNat1099914.ogg": [0, 1],
+    "houspa/iNat1136280.ogg": [0, 1, 2],
+    "houspa/iNat1191117.ogg": [0],
+    "houspa/iNat1303881.ogg": [0, 1, 2],
+    "houspa/iNat1307600.ogg": [0, 1, 2],
+    "houspa/iNat1577290.ogg": [0, 1, 2],
+    "houspa/iNat1593817.ogg": [0, 1, 2],
+    "houspa/iNat1621812.ogg": [0, 1, 2],
+    "houspa/iNat1622868.ogg": [0],
+    "houspa/iNat1651003.ogg": [0, 1],
+    "houspa/iNat1676113.ogg": [0, 1, 2],
+    "houspa/iNat1729310.ogg": [0, 1, 2],
+    "houspa/iNat1731791.ogg": [0],
+    "houspa/iNat217689.ogg": [0, 1, 2],
+    "houspa/iNat34444.ogg": [0, 1],
+    "houspa/iNat348673.ogg": [0, 1, 2],
+    "houspa/iNat358583.ogg": [0, 1, 2],
+    "houspa/iNat363549.ogg": [0, 1, 2],
+    "houspa/iNat408728.ogg": [0, 1],
+    "houspa/iNat464631.ogg": [0],
+    "houspa/iNat487118.ogg": [0, 1, 2],
+    "houspa/iNat491416.ogg": [0, 1, 2],
+    "houspa/iNat672437.ogg": [0, 1, 2],
+    "houspa/iNat675508.ogg": [0, 1, 2],
+    "houspa/iNat849843.ogg": [0, 1],
+    "houspa/iNat851766.ogg": [0, 1],
+    "houspa/iNat903527.ogg": [0, 1, 2],
+    "houspa/iNat921893.ogg": [0, 1, 2],
+    "houspa/iNat936503.ogg": [0, 1, 2],
+    "houspa/iNat946482.ogg": [0, 1, 2],
+    "houspa/iNat979631.ogg": [0, 1, 2],
+    "osprey/XC1013321.ogg": [0, 1],
+    "osprey/XC166110.ogg": [0, 1, 2],
+    "osprey/XC478514.ogg": [0, 1, 2],
+    "osprey/XC511013.ogg": [0, 1, 2],
+    "osprey/XC708890.ogg": [0, 1, 2],
+    "osprey/XC926548.ogg": [0, 1, 2],
+    "osprey/XC979316.ogg": [0, 1, 2],
+    "osprey/iNat1096890.ogg": [0, 1, 2],
+    "osprey/iNat1117042.ogg": [0, 1, 2],
+    "osprey/iNat1131047.ogg": [0, 1, 2],
+    "osprey/iNat1135797.ogg": [0],
+    "osprey/iNat1153593.ogg": [0, 1, 2],
+    "osprey/iNat1162431.ogg": [0, 1],
+    "osprey/iNat1194943.ogg": [0, 1, 2],
+    "osprey/iNat132477.ogg": [0, 1],
+    "osprey/iNat132489.ogg": [0, 1],
+    "osprey/iNat133040.ogg": [0, 1],
+    "osprey/iNat1359848.ogg": [0],
+    "osprey/iNat1370949.ogg": [0],
+    "osprey/iNat1371014.ogg": [0, 1, 2],
+    "osprey/iNat1404543.ogg": [0, 1],
+    "osprey/iNat1501632.ogg": [0],
+    "osprey/iNat1507469.ogg": [0, 1, 2],
+    "osprey/iNat1538892.ogg": [0, 1],
+    "osprey/iNat1584380.ogg": [0, 1],
+    "osprey/iNat1599901.ogg": [0, 1, 2],
+    "osprey/iNat1607924.ogg": [0, 1, 2],
+    "osprey/iNat1638851.ogg": [0, 1],
+    "osprey/iNat186555.ogg": [0, 1, 2],
+    "osprey/iNat227465.ogg": [0, 1, 2],
+    "osprey/iNat232424.ogg": [0, 1, 2],
+    "osprey/iNat286858.ogg": [0, 1, 2],
+    "osprey/iNat367158.ogg": [0, 1],
+    "osprey/iNat374578.ogg": [0, 1, 2],
+    "osprey/iNat376728.ogg": [0, 1],
+    "osprey/iNat385662.ogg": [0, 1, 2],
+    "osprey/iNat479394.ogg": [0, 1],
+    "osprey/iNat492734.ogg": [0, 1],
+    "osprey/iNat516795.ogg": [0, 1, 2],
+    "osprey/iNat555.ogg": [0, 1, 2],
+    "osprey/iNat626122.ogg": [0, 1],
+    "osprey/iNat632961.ogg": [0, 1],
+    "osprey/iNat651010.ogg": [0, 1],
+    "osprey/iNat661776.ogg": [0, 1, 2],
+    "osprey/iNat733353.ogg": [0, 1, 2],
+    "osprey/iNat740843.ogg": [0],
+    "osprey/iNat747591.ogg": [0, 1, 2],
+    "osprey/iNat787085.ogg": [0, 1, 2],
+    "osprey/iNat790339.ogg": [0, 1, 2],
+    "osprey/iNat971456.ogg": [0, 1, 2],
+    "rubthr1/XC150154.ogg": [0, 1, 2],
+    "rubthr1/XC174817.ogg": [0, 1, 2],
+    "rubthr1/XC203427.ogg": [0, 1, 2],
+    "rubthr1/XC212138.ogg": [0, 1, 2],
+    "rubthr1/XC212464.ogg": [0, 1, 2],
+    "rubthr1/XC286716.ogg": [0, 1, 2],
+    "rubthr1/XC289104.ogg": [0, 1, 2],
+    "rubthr1/XC293351.ogg": [0, 1, 2],
+    "rubthr1/XC358018.ogg": [0, 1],
+    "rubthr1/XC472331.ogg": [0, 1, 2],
+    "rubthr1/XC508152.ogg": [0, 1, 2],
+    "rubthr1/XC512533.ogg": [0, 1, 2],
+    "rubthr1/XC52191.ogg": [0],
+    "rubthr1/XC578124.ogg": [0, 1, 2],
+    "rubthr1/XC586910.ogg": [0, 1, 2],
+    "rubthr1/XC611393.ogg": [0, 1, 2],
+    "rubthr1/XC771056.ogg": [0, 1, 2],
+    "rubthr1/XC896056.ogg": [0, 1, 2],
+    "rubthr1/iNat1082349.ogg": [0],
+    "rubthr1/iNat1094287.ogg": [0, 1, 2],
+    "rubthr1/iNat1132353.ogg": [0, 1],
+    "rubthr1/iNat138390.ogg": [0, 1, 2],
+    "rubthr1/iNat139344.ogg": [0, 1, 2],
+    "rubthr1/iNat1438943.ogg": [0, 1, 2],
+    "rubthr1/iNat1459448.ogg": [0, 1, 2],
+    "rubthr1/iNat1581115.ogg": [0, 1, 2],
+    "rubthr1/iNat1666862.ogg": [0, 1, 2],
+    "rubthr1/iNat1666865.ogg": [0, 1, 2],
+    "rubthr1/iNat1680675.ogg": [0, 1, 2],
+    "rubthr1/iNat1688310.ogg": [0, 1, 2],
+    "rubthr1/iNat1705419.ogg": [0, 1, 2],
+    "rubthr1/iNat1712721.ogg": [0, 1, 2],
+    "rubthr1/iNat1720250.ogg": [0, 1, 2],
+    "rubthr1/iNat1736309.ogg": [0, 1, 2],
+    "rubthr1/iNat276456.ogg": [0, 1, 2],
+    "rubthr1/iNat304925.ogg": [0, 1, 2],
+    "rubthr1/iNat312467.ogg": [0, 1, 2],
+    "rubthr1/iNat317135.ogg": [0, 1, 2],
+    "rubthr1/iNat321534.ogg": [0, 1, 2],
+    "rubthr1/iNat321928.ogg": [0, 1, 2],
+    "rubthr1/iNat328679.ogg": [0, 1, 2],
+    "rubthr1/iNat334710.ogg": [0, 1, 2],
+    "rubthr1/iNat344147.ogg": [0, 1, 2],
+    "rubthr1/iNat52896.ogg": [0, 1, 2],
+    "rubthr1/iNat532419.ogg": [0, 1, 2],
+    "rubthr1/iNat559280.ogg": [0, 1, 2],
+    "rubthr1/iNat695864.ogg": [0, 1, 2],
+    "rubthr1/iNat714751.ogg": [0, 1, 2],
+    "rubthr1/iNat762495.ogg": [0, 1, 2],
+    "rubthr1/iNat852442.ogg": [0],
+    "socfly1/XC1016008.ogg": [0, 1, 2],
+    "socfly1/XC1016009.ogg": [0, 1, 2],
+    "socfly1/XC126194.ogg": [0, 1],
+    "socfly1/XC169982.ogg": [0, 1, 2],
+    "socfly1/XC170117.ogg": [0, 1, 2],
+    "socfly1/XC194423.ogg": [0, 1, 2],
+    "socfly1/XC249866.ogg": [0, 1, 2],
+    "socfly1/XC254188.ogg": [0, 1, 2],
+    "socfly1/XC288716.ogg": [0],
+    "socfly1/XC29661.ogg": [0, 1, 2],
+    "socfly1/XC352974.ogg": [0],
+    "socfly1/XC361771.ogg": [0, 1, 2],
+    "socfly1/XC384654.ogg": [0, 1, 2],
+    "socfly1/XC414507.ogg": [0, 1, 2],
+    "socfly1/XC444592.ogg": [0, 1, 2],
+    "socfly1/XC446777.ogg": [0, 1, 2],
+    "socfly1/XC456715.ogg": [0, 1],
+    "socfly1/XC471366.ogg": [0, 1, 2],
+    "socfly1/XC493192.ogg": [0, 1, 2],
+    "socfly1/XC543863.ogg": [0],
+    "socfly1/XC592983.ogg": [0, 1],
+    "socfly1/XC63689.ogg": [0, 1, 2],
+    "socfly1/XC659531.ogg": [0, 1, 2],
+    "socfly1/XC774129.ogg": [0, 1, 2],
+    "socfly1/XC927015.ogg": [0],
+    "socfly1/XC927106.ogg": [0],
+    "socfly1/XC9352.ogg": [0],
+    "socfly1/XC955368.ogg": [0, 1, 2],
+    "socfly1/iNat105970.ogg": [0, 1, 2],
+    "socfly1/iNat1118591.ogg": [0, 1, 2],
+    "socfly1/iNat1181651.ogg": [0],
+    "socfly1/iNat1243633.ogg": [0, 1],
+    "socfly1/iNat1335733.ogg": [0, 1, 2],
+    "socfly1/iNat1375018.ogg": [0, 1],
+    "socfly1/iNat1687317.ogg": [0],
+    "socfly1/iNat1727825.ogg": [0, 1, 2],
+    "socfly1/iNat250967.ogg": [0, 1, 2],
+    "socfly1/iNat287442.ogg": [0, 1],
+    "socfly1/iNat301919.ogg": [0, 1, 2],
+    "socfly1/iNat319739.ogg": [0, 1, 2],
+    "socfly1/iNat374535.ogg": [0],
+    "socfly1/iNat546394.ogg": [0, 1, 2],
+    "socfly1/iNat568306.ogg": [0, 1, 2],
+    "socfly1/iNat600879.ogg": [0, 1, 2],
+    "socfly1/iNat64535.ogg": [0, 1, 2],
+    "socfly1/iNat667534.ogg": [0, 1, 2],
+    "socfly1/iNat69753.ogg": [0, 1, 2],
+    "socfly1/iNat920538.ogg": [0, 1, 2],
+    "socfly1/iNat948751.ogg": [0, 1, 2],
+    "socfly1/iNat948792.ogg": [0, 1, 2],
+    "soulap1/XC114069.ogg": [0, 1, 2],
+    "soulap1/XC244850.ogg": [0, 1, 2],
+    "soulap1/XC347764.ogg": [0, 1, 2],
+    "soulap1/XC353317.ogg": [0, 1, 2],
+    "soulap1/XC385647.ogg": [0, 1],
+    "soulap1/XC393117.ogg": [0, 1, 2],
+    "soulap1/XC412737.ogg": [0, 1, 2],
+    "soulap1/XC452630.ogg": [0],
+    "soulap1/XC460550.ogg": [0, 1, 2],
+    "soulap1/XC47141.ogg": [0, 1, 2],
+    "soulap1/XC475624.ogg": [0, 1, 2],
+    "soulap1/XC510860.ogg": [0, 1, 2],
+    "soulap1/XC524131.ogg": [0, 1, 2],
+    "soulap1/XC534308.ogg": [0, 1, 2],
+    "soulap1/XC546406.ogg": [0, 1, 2],
+    "soulap1/XC560824.ogg": [0, 1, 2],
+    "soulap1/XC637646.ogg": [0, 1],
+    "soulap1/XC712956.ogg": [0, 1, 2],
+    "soulap1/XC789522.ogg": [0, 1],
+    "soulap1/XC902305.ogg": [0, 1, 2],
+    "soulap1/XC975744.ogg": [0, 1, 2],
+    "soulap1/iNat1182101.ogg": [0, 1, 2],
+    "soulap1/iNat1191137.ogg": [0, 1, 2],
+    "soulap1/iNat1195534.ogg": [0, 1, 2],
+    "soulap1/iNat1242337.ogg": [0, 1, 2],
+    "soulap1/iNat1259535.ogg": [0, 1],
+    "soulap1/iNat1269554.ogg": [0, 1, 2],
+    "soulap1/iNat1343819.ogg": [0, 1, 2],
+    "soulap1/iNat1373214.ogg": [0, 1, 2],
+    "soulap1/iNat147630.ogg": [0, 1, 2],
+    "soulap1/iNat149380.ogg": [0, 1, 2],
+    "soulap1/iNat152118.ogg": [0, 1],
+    "soulap1/iNat1653553.ogg": [0, 1],
+    "soulap1/iNat166333.ogg": [0, 1],
+    "soulap1/iNat1683591.ogg": [0, 1, 2],
+    "soulap1/iNat1685486.ogg": [0],
+    "soulap1/iNat1693281.ogg": [0, 1, 2],
+    "soulap1/iNat216822.ogg": [0],
+    "soulap1/iNat273637.ogg": [0, 1, 2],
+    "soulap1/iNat307134.ogg": [0, 1, 2],
+    "soulap1/iNat311203.ogg": [0, 1],
+    "soulap1/iNat550069.ogg": [0],
+    "soulap1/iNat557894.ogg": [0, 1, 2],
+    "soulap1/iNat59859.ogg": [0, 1, 2],
+    "soulap1/iNat599361.ogg": [0, 1],
+    "soulap1/iNat607072.ogg": [0, 1, 2],
+    "soulap1/iNat614475.ogg": [0],
+    "soulap1/iNat76185.ogg": [0],
+    "soulap1/iNat84016.ogg": [0, 1, 2],
+    "soulap1/iNat996764.ogg": [0, 1],
+    "yeofly1/XC1031974.ogg": [0, 1, 2],
+    "yeofly1/XC1035541.ogg": [0],
+    "yeofly1/XC121248.ogg": [0, 1, 2],
+    "yeofly1/XC122415.ogg": [0, 1, 2],
+    "yeofly1/XC125754.ogg": [0, 1, 2],
+    "yeofly1/XC146300.ogg": [0, 1, 2],
+    "yeofly1/XC180624.ogg": [0, 1, 2],
+    "yeofly1/XC186291.ogg": [0, 1, 2],
+    "yeofly1/XC240485.ogg": [0, 1, 2],
+    "yeofly1/XC250351.ogg": [0, 1],
+    "yeofly1/XC255982.ogg": [0, 1, 2],
+    "yeofly1/XC263206.ogg": [0, 1, 2],
+    "yeofly1/XC268593.ogg": [0, 1],
+    "yeofly1/XC268594.ogg": [0, 1, 2],
+    "yeofly1/XC283328.ogg": [0, 1, 2],
+    "yeofly1/XC303668.ogg": [0, 1, 2],
+    "yeofly1/XC339728.ogg": [0, 1, 2],
+    "yeofly1/XC375735.ogg": [0, 1, 2],
+    "yeofly1/XC385773.ogg": [0, 1, 2],
+    "yeofly1/XC393155.ogg": [0, 1],
+    "yeofly1/XC395761.ogg": [0, 1, 2],
+    "yeofly1/XC428100.ogg": [0, 1, 2],
+    "yeofly1/XC431036.ogg": [0, 1, 2],
+    "yeofly1/XC433522.ogg": [0, 1, 2],
+    "yeofly1/XC433527.ogg": [0, 1, 2],
+    "yeofly1/XC479866.ogg": [0, 1, 2],
+    "yeofly1/XC486467.ogg": [0, 1],
+    "yeofly1/XC51044.ogg": [0, 1, 2],
+    "yeofly1/XC51047.ogg": [0, 1],
+    "yeofly1/XC510978.ogg": [0, 1, 2],
+    "yeofly1/XC552803.ogg": [0, 1, 2],
+    "yeofly1/XC555863.ogg": [0, 1, 2],
+    "yeofly1/XC583769.ogg": [0, 1],
+    "yeofly1/XC589727.ogg": [0, 1, 2],
+    "yeofly1/XC599728.ogg": [0, 1, 2],
+    "yeofly1/XC643129.ogg": [0, 1],
+    "yeofly1/XC741079.ogg": [0],
+    "yeofly1/XC796989.ogg": [0, 1, 2],
+    "yeofly1/XC843446.ogg": [0],
+    "yeofly1/XC844036.ogg": [0, 1],
+    "yeofly1/XC854882.ogg": [0, 1, 2],
+    "yeofly1/XC898429.ogg": [0, 1],
+    "yeofly1/XC917553.ogg": [0, 1],
+    "yeofly1/XC927002.ogg": [0, 1, 2],
+    "yeofly1/XC932693.ogg": [0, 1, 2],
+    "yeofly1/iNat1290715.ogg": [0, 1, 2],
+    "yeofly1/iNat1547474.ogg": [0],
+    "yeofly1/iNat1584258.ogg": [0, 1],
+    "yeofly1/iNat1642380.ogg": [0, 1, 2],
+    "yeofly1/iNat888323.ogg": [0, 1, 2],
+}
+
+
+def normalize_rms(audio: np.ndarray, target: float = 0.1) -> np.ndarray:
+    rms = float(np.sqrt(np.mean(audio ** 2)))
+    if rms < 1e-6:
+        return audio
+    return audio * (target / rms)
+
+
+def get_window(audio: np.ndarray, win_idx: int) -> np.ndarray:
+    """Retourne la fenetre num win_idx (zero-pad si fichier trop court)."""
+    start = win_idx * WINDOW_SAMPLES
+    end = start + WINDOW_SAMPLES
+    if start >= len(audio):
+        return np.zeros(WINDOW_SAMPLES, dtype=np.float32)
+    if end > len(audio):
+        chunk = np.zeros(WINDOW_SAMPLES, dtype=np.float32)
+        chunk[: len(audio) - start] = audio[start:]
+        return chunk
+    return audio[start:end].astype(np.float32)
+
+
+def extract_embedding(model, window: np.ndarray) -> np.ndarray:
+    win_tensor = tf.constant(window[None, :], dtype=tf.float32)
+    output = model.infer_tf(win_tensor)
+    if isinstance(output, dict):
+        emb = output.get("embedding")
+        if emb is None:
+            emb = next(v for k, v in output.items() if "embed" in k.lower())
+    elif isinstance(output, (tuple, list)):
+        emb = output[1] if len(output) >= 2 else output[0]
+    else:
+        emb = output
+    return emb.numpy()[0].astype(np.float32)
+
+
+def main() -> None:
+    t_start = time.time()
+
+    # 1. Verifier paths
+    for path in (DATA_ROOT, Path(MODEL_PATH)):
+        if not path.exists():
+            print(f"ERREUR : path introuvable {path}")
+            sys.exit(1)
+
+    print(f"Liste fichiers : {len(FILE_TO_WINDOWS)} fichiers, "
+          f"{sum(len(w) for w in FILE_TO_WINDOWS.values())} fenetres a extraire")
+
+    # 2. Recupere primary_label depuis train.csv pour chaque filename
+    print("Lecture train.csv pour mapper filename -> primary_label")
+    df_train = pd.read_csv(DATA_ROOT / "train.csv")[["filename", "primary_label"]]
+    fn_to_label = dict(zip(df_train["filename"], df_train["primary_label"]))
+    # Verifier que tous nos filenames sont la
+    missing = [fn for fn in FILE_TO_WINDOWS if fn not in fn_to_label]
+    if missing:
+        print(f"ATTENTION : {len(missing)} fichiers manquants dans train.csv :")
+        for fn in missing[:10]:
+            print(f"  {fn}")
+        sys.exit(1)
+    print("Tous les fichiers presents dans train.csv.")
+
+    # 3. Charger Perch
+    print(f"Chargement Perch v8 depuis {MODEL_PATH}")
+    model = hub.load(MODEL_PATH)
+    print("Modele charge.")
+
+    # 4. Extraction
+    audio_root = DATA_ROOT / "train_audio"
+    all_embeddings = []
+    meta_rows = []
+    n_errors = 0
+    t_extract = time.time()
+    filenames_sorted = sorted(FILE_TO_WINDOWS.keys())
+
+    for i, filename in enumerate(filenames_sorted):
+        if i % 25 == 0:
+            elapsed = time.time() - t_extract
+            print(f"  {i}/{len(filenames_sorted)} fichiers, "
+                  f"{len(all_embeddings)} fenetres, {n_errors} erreurs, {elapsed:.0f}s")
+        audio_path = audio_root / filename
+        try:
+            audio, _ = librosa.load(str(audio_path), sr=SAMPLE_RATE, mono=True)
+            audio = normalize_rms(audio)
+            for w_idx in FILE_TO_WINDOWS[filename]:
+                window = get_window(audio, w_idx)
+                emb = extract_embedding(model, window)
+                all_embeddings.append(emb)
+                meta_rows.append({
+                    "filename": filename,
+                    "primary_label": fn_to_label[filename],
+                    "window_idx": w_idx,
+                })
+        except Exception as err:
+            n_errors += 1
+            print(f"  [ERREUR] {filename}: {err}")
+
+    extract_duration = time.time() - t_extract
+    print(f"\nExtraction terminee : {len(all_embeddings)} embeddings, "
+          f"{n_errors} erreurs, duree {extract_duration:.0f}s")
+
+    # 5. Sauvegarde
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    np.save(OUTPUT_DIR / "embeddings_perch_v8_top10_aligned.npy",
+            np.array(all_embeddings, dtype=np.float32))
+    pd.DataFrame(meta_rows).to_csv(
+        OUTPUT_DIR / "embeddings_perch_v8_top10_aligned_meta.csv", index=False)
+    print(f"\nSauvegarde OK")
+    print(f"\n=== Termine en {(time.time() - t_start):.0f}s ===")
+
+
+if __name__ == "__main__":
+    main()

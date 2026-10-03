@@ -1,0 +1,177 @@
+{
+  "experiment_id": "perch_models_aligned",
+  "timestamp": "2026-05-19T13:56:27",
+  "duration_seconds": 502.2,
+  "config": {
+    "embeddings_path": "data/processed/embeddings_perch_v8_top10_aligned.npy",
+    "meta_path": "data/processed/embeddings_perch_v8_top10_aligned_meta.csv",
+    "n_splits": 5,
+    "n_estimators_lgbm": 300,
+    "cv_strategy": "StratifiedGroupKFold groupe par filename, identique sessions 3.1-3.3"
+  },
+  "dataset": {
+    "n_samples": 1343,
+    "embedding_dim": 1280,
+    "n_species": 10,
+    "species": [
+      "banana",
+      "coffal1",
+      "compau",
+      "fepowl",
+      "houspa",
+      "osprey",
+      "rubthr1",
+      "socfly1",
+      "soulap1",
+      "yeofly1"
+    ]
+  },
+  "results_by_model": {
+    "LightGBM": {
+      "n_splits": 5,
+      "macro_roc_auc_mean": 0.953,
+      "macro_roc_auc_std": 0.0103,
+      "macro_per_fold": [
+        0.94,
+        0.9515,
+        0.9541,
+        0.9687,
+        0.9507
+      ],
+      "per_species_mean": {
+        "banana": 0.9657,
+        "coffal1": 0.9586,
+        "compau": 0.9685,
+        "fepowl": 0.9563,
+        "houspa": 0.9743,
+        "osprey": 0.9155,
+        "rubthr1": 0.9373,
+        "socfly1": 0.9374,
+        "soulap1": 0.9583,
+        "yeofly1": 0.9581
+      },
+      "per_species_std": {
+        "banana": 0.0218,
+        "coffal1": 0.0253,
+        "compau": 0.0207,
+        "fepowl": 0.0159,
+        "houspa": 0.0119,
+        "osprey": 0.0255,
+        "rubthr1": 0.0298,
+        "socfly1": 0.0306,
+        "soulap1": 0.0245,
+        "yeofly1": 0.026
+      },
+      "fold_info": [
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1067,
+          "n_val": 276,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1074,
+          "n_val": 269,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        }
+      ],
+      "duration_seconds": 497.4
+    },
+    "LogReg L2": {
+      "n_splits": 5,
+      "macro_roc_auc_mean": 0.9569,
+      "macro_roc_auc_std": 0.0173,
+      "macro_per_fold": [
+        0.9283,
+        0.962,
+        0.965,
+        0.9739,
+        0.9555
+      ],
+      "per_species_mean": {
+        "banana": 0.9645,
+        "coffal1": 0.9598,
+        "compau": 0.9727,
+        "fepowl": 0.9489,
+        "houspa": 0.9864,
+        "osprey": 0.8901,
+        "rubthr1": 0.9617,
+        "socfly1": 0.9434,
+        "soulap1": 0.972,
+        "yeofly1": 0.9698
+      },
+      "per_species_std": {
+        "banana": 0.0205,
+        "coffal1": 0.0193,
+        "compau": 0.0257,
+        "fepowl": 0.032,
+        "houspa": 0.0131,
+        "osprey": 0.0523,
+        "rubthr1": 0.0256,
+        "socfly1": 0.0408,
+        "soulap1": 0.0234,
+        "yeofly1": 0.0216
+      },
+      "fold_info": [
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1067,
+          "n_val": 276,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1074,
+          "n_val": 269,
+          "n_species_nan": 0,
+          "species_nan": []
+        },
+        {
+          "n_train": 1077,
+          "n_val": 266,
+          "n_species_nan": 0,
+          "species_nan": []
+        }
+      ],
+      "duration_seconds": 4.8
+    }
+  },
+  "reference_manual_features": {
+    "lgbm_tuned_cv_mean": 0.8869,
+    "lgbm_tuned_cv_std": 0.0236,
+    "lgbm_baseline_cv_mean": 0.8632,
+    "lgbm_baseline_cv_std": 0.0174,
+    "logreg_l2_cv_mean": 0.8636,
+    "logreg_l2_cv_std": 0.0092
+  }
+}

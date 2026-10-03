@@ -1,0 +1,37 @@
+# Audio
+librosa==0.10.2.post1
+soundfile==0.12.1
+resampy==0.4.3
+
+# Calcul scientifique
+numpy==1.26.4
+scipy==1.13.1
+pandas==2.2.2
+pyarrow==16.1.0
+
+# Modèles classiques
+lightgbm==4.5.0
+xgboost==2.1.1
+scikit-learn==1.5.1
+
+# Tuning (jour 3)
+optuna==3.6.1
+
+# Acces Kaggle (jour 3 : extraction embeddings Perch)
+kaggle==2.1.2
+
+# Parallélisation et progression
+joblib==1.4.2
+tqdm==4.66.4
+
+# Visualisation
+matplotlib==3.9.0
+seaborn==0.13.2
+cartopy==0.25.0
+
+# Notebooks
+jupyter==1.0.0
+ipykernel==6.29.5
+
+# Tests
+pytest==8.2.2

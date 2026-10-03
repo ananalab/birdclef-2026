@@ -1,0 +1,49 @@
+{
+  "experiment_id": "baseline",
+  "timestamp": "2026-05-16T16:53:20",
+  "duration_seconds": 29.6,
+  "config": {
+    "n_top_species": 10,
+    "n_files_per_species": 50,
+    "n_soundscapes_for_submission": 10,
+    "random_seed": 42,
+    "n_features": 26,
+    "features_type": "mfcc_baseline (13 MFCC x mean+std)",
+    "model": "LightGBM one-vs-rest, params par defaut"
+  },
+  "dataset": {
+    "top_species": [
+      "rubthr1",
+      "banana",
+      "soulap1",
+      "fepowl",
+      "houspa",
+      "osprey",
+      "coffal1",
+      "socfly1",
+      "compau",
+      "yeofly1"
+    ],
+    "n_samples_total": 500,
+    "n_samples_train": 400,
+    "n_samples_val": 100
+  },
+  "scores": {
+    "macro_roc_auc_val": 0.7469,
+    "per_species_roc_auc": {
+      "rubthr1": 0.8684,
+      "banana": 0.7477,
+      "soulap1": 0.9377,
+      "fepowl": 0.8205,
+      "houspa": 0.7526,
+      "osprey": 0.6259,
+      "coffal1": 0.6981,
+      "socfly1": 0.6619,
+      "compau": 0.7116,
+      "yeofly1": 0.6447
+    }
+  },
+  "outputs": {
+    "submission_csv": "submissions/baseline.csv"
+  }
+}

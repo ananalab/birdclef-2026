@@ -1,0 +1,15 @@
+{
+  "id": "anaisazouaoui/extract-perch-v8-embeddings-top10-aligned",
+  "title": "Extract Perch v8 embeddings top10 aligned",
+  "code_file": "extract_perch_top10_aligned.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": false,
+  "dataset_sources": [],
+  "competition_sources": ["birdclef-2026"],
+  "kernel_sources": [],
+  "model_sources": ["google/bird-vocalization-classifier/tensorFlow2/bird-vocalization-classifier/8"]
+}

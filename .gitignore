@@ -1,0 +1,53 @@
+# Environnement virtuel
+venv/
+.venv/
+
+# Dataset Kaggle (~15 GB, à ne jamais committer)
+birdclef-2026/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Notebooks
+.ipynb_checkpoints/
+notebooks/01_eda.ipynb
+
+# Mac
+.DS_Store
+
+# Artefacts (gros fichiers, modèles entraînés, embeddings)
+models/*.txt
+models/*.pkl
+models/*.joblib
+models/**/*.txt
+models/**/*.pkl
+models/**/*.joblib
+data/processed/*.parquet
+data/processed/*.npy
+data/processed/embeddings_*.csv
+data/processed/_shards_features_focal/
+data/processed/_shards_features_aug/
+data/processed/_*.csv
+
+# Logs de runs longs (regenerables)
+logs/
+
+# Artefacts de compilation LaTeX (regenerables)
+*.aux
+*.bbl
+*.blg
+*.out
+*.toc
+*.run.xml
+*-blx.bib
+starter_rapport.log
+starter_rapport.pdf
+
+# Copie locale des figures pour compilation (canon : report/figures/)
+/figures/
+
+# IDE
+.vscode/
+.idea/

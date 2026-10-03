@@ -1,0 +1,24 @@
+{
+  "experiment_id": "pseudo_label",
+  "scores": {
+    "perch_pseudo": {
+      "macro_min1": 0.714,
+      "macro_min20": 0.706
+    },
+    "strict_pseudo": {
+      "macro_min1": 0.6562,
+      "macro_min20": 0.7004
+    }
+  },
+  "n_pseudo_labels": 9356,
+  "reference_heldout_sans_pseudo": {
+    "strict": {
+      "macro_min1": 0.6104,
+      "macro_min20": 0.5754
+    },
+    "perch": {
+      "macro_min1": 0.746,
+      "macro_min20": 0.7721
+    }
+  }
+}

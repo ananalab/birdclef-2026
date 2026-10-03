@@ -1,0 +1,17 @@
+{
+  "experiment_id": "augmented",
+  "scores": {
+    "strict_aug": {
+      "macro_min1": 0.6143,
+      "macro_min20": 0.5904
+    },
+    "perch_aug": {
+      "macro_min1": 0.7119,
+      "macro_min20": 0.7225
+    },
+    "perch_noaug_3win": {
+      "macro_min1": 0.7353,
+      "macro_min20": 0.7443
+    }
+  }
+}
